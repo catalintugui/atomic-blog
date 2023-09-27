@@ -1,4 +1,11 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { faker } from "@faker-js/faker";
 
 function createRandomPost() {
@@ -28,9 +35,23 @@ function App() {
         )
       : posts;
 
-  function handleAddPost(post) {
+  //useMemo to keep data in memory (objects) - other wise memo (to memoize primitive data)
+  const archiveOptions = useMemo(() => {
+    return {
+      show: false,
+      title: `Posts arhive in addition to ${posts.length}`,
+    };
+  }, [posts.length]);
+
+  // function handleAddPost(post) {
+  //   setPosts((posts) => [post, ...posts]);
+  // }
+
+  //useCallback to keep function in memory
+  //setter functions from useState are memoized by default
+  const handleAddPost = useCallback(function handleAddPost(post) {
     setPosts((posts) => [post, ...posts]);
-  }
+  }, []);
 
   function handleClearPosts() {
     setPosts([]);
@@ -65,7 +86,11 @@ function App() {
 
         <Header />
         <Main />
-        <Archive />
+        <Archive
+          archiveOptions={archiveOptions}
+          onAddPost={handleAddPost}
+          setIsFakeDark={setIsFakeDark}
+        />
         <Footer />
       </section>
     </PostContext.Provider>
